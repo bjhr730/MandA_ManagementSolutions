@@ -211,8 +211,10 @@ Owned by the business, not the code:
 - [ ] Register the domain, set `SITE_URL`, verify the sending domain in Resend
 - [ ] Set `SITE_INDEXABLE="true"` in production (and only production) so the
       site can be indexed
-- [ ] Set up Cloudflare Turnstile and add both keys in Vercel
-- [ ] Delete the test row from `inquiries` (`DELETE FROM inquiries WHERE email = 'test.owner@example.com'`)
+- [ ] Replace the Turnstile **test** keys in Vercel with real ones from the
+      Cloudflare dashboard (staging currently uses the always-pass pair)
+- [ ] Delete the test rows from `inquiries`
+      (`DELETE FROM inquiries WHERE email LIKE '%@example.com'`)
 - [ ] Submit the live form end to end and confirm both emails arrive
 - [ ] Set up the Google Business Profile once eligible
 
@@ -220,9 +222,36 @@ Owned by the business, not the code:
 
 ## Deploying
 
-Connect the repository to Vercel. The `@astrojs/vercel` adapter is already
-configured; no build settings need changing. Add the environment variables
-above in the Vercel project, including `SITE_URL` with the production domain.
+**Staging:** https://manda-management-solutions.vercel.app
+
+The Vercel project `manda-management-solutions` is linked to this repository,
+so every push to `main` deploys. The `@astrojs/vercel` adapter is already
+configured; no build settings need changing.
+
+Staging deliberately differs from production in three ways:
+
+- `SITE_INDEXABLE` is unset, so the whole site is `noindex` and `robots.txt`
+  serves `Disallow: /`.
+- Turnstile uses Cloudflare's **published always-pass test keys**
+  (`1x00000000000000000000AA` / `1x0000000000000000000000000000000AA`). These
+  are documented dummy values, not credentials. They exist because the handler
+  rejects every submission when `TURNSTILE_SECRET_KEY` is missing in
+  production, which would otherwise make the staging form look broken.
+  **Replace both with real keys before launch.**
+- Resend is not configured, so inquiries are stored in Neon but no email is
+  sent. That path is exercised by the code; it just has nowhere to send until
+  a sending domain is verified.
+
+### Why `security.checkOrigin` is off
+
+Astro's built-in cross-origin POST check compares the `Origin` header against
+the host it sees on the request. Behind Vercel's proxy that is not the host the
+browser addressed, so it returned `403 Cross-site POST form submissions are
+forbidden` on every submission, including same-origin ones. The equivalent
+check now lives in `sameOrigin()` in `src/lib/inquiry.ts` and reads
+`x-forwarded-host` first, so it is correct behind the proxy. Verified both
+ways against the live deployment: a same-origin POST succeeds, a POST carrying
+a foreign `Origin` is refused.
 
 Static pages are served from the CDN. `/contact` runs as a serverless function
 because it accepts `POST`.
