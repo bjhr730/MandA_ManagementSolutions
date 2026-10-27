@@ -213,8 +213,6 @@ Owned by the business, not the code:
       site can be indexed
 - [ ] Replace the Turnstile **test** keys in Vercel with real ones from the
       Cloudflare dashboard (staging currently uses the always-pass pair)
-- [ ] Delete the test rows from `inquiries`
-      (`DELETE FROM inquiries WHERE email LIKE '%@example.com'`)
 - [ ] Submit the live form end to end and confirm both emails arrive
 - [ ] Set up the Google Business Profile once eligible
 
