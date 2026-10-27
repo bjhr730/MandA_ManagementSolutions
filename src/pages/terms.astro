@@ -1,0 +1,110 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Disclosure from '~/components/Disclosure.astro';
+import PageHeader from '~/components/PageHeader.astro';
+import Section from '~/components/Section.astro';
+
+import {
+  BROKERAGE_DISCLOSURE,
+  LEGAL_LAST_UPDATED,
+  LEGAL_REVIEW_DATE,
+  PRICING_DISCLOSURE,
+  REVIEW_MODE,
+} from '~/config/compliance';
+import { CONTACT, LEGAL_ENTITY } from '~/config/site';
+---
+
+<BaseLayout
+  title="Website Terms"
+  description="Terms of use for this website, including the limits of the information published here."
+>
+  <PageHeader
+    eyebrow="Legal"
+    title="Website Terms"
+    lead={LEGAL_REVIEW_DATE ? `Last reviewed: ${LEGAL_REVIEW_DATE}` : LEGAL_LAST_UPDATED}
+  />
+
+  <Section>
+    <div class="prose-site">
+      {
+        REVIEW_MODE && (
+          <Disclosure label="Draft" pending>
+            <p>
+              Working draft, not reviewed by an attorney. Virginia DPOR
+              advertising rules and licensed firm identification requirements
+              must be confirmed before this site goes live.
+            </p>
+          </Disclosure>
+        )
+      }
+
+      <h2>Who operates this site</h2>
+      <p>
+        This website is operated by {LEGAL_ENTITY}, a Virginia limited
+        liability company providing residential property management services in
+        Northern Virginia.
+      </p>
+
+      <h2>Information here is general</h2>
+      <p>
+        The descriptions of services, management approach and fees on this site
+        are general information for prospective clients. They are not an offer,
+        and they do not create a management agreement or any other contract.
+      </p>
+      <p>{PRICING_DISCLOSURE}</p>
+      <p>
+        Where this site and a signed management agreement differ, the signed
+        agreement governs.
+      </p>
+
+      <h2>Brokerage services</h2>
+      <p>{BROKERAGE_DISCLOSURE}</p>
+
+      <h2>Not legal, tax or investment advice</h2>
+      <p>
+        Nothing on this site is legal, tax, accounting or investment advice.
+        Property ownership decisions should be made with your own attorney, CPA
+        or financial professional.
+      </p>
+
+      <h2>Accuracy</h2>
+      <p>
+        We work to keep this site accurate and current, but we do not warrant
+        that every page is free of error or completely up to date. Market
+        conditions, regulations and our own procedures change.
+      </p>
+
+      <h2>Links to other sites</h2>
+      <p>
+        Where we link to a third party, including any owner or resident portal,
+        that site has its own terms and privacy practices and we are not
+        responsible for its content.
+      </p>
+
+      <h2>Acceptable use</h2>
+      <p>
+        Please do not attempt to disrupt the site, submit automated or
+        fraudulent inquiries, or use anything published here to harass anyone or
+        to build a mailing list.
+      </p>
+
+      <h2>Intellectual property</h2>
+      <p>
+        The text, design and marks on this site belong to {LEGAL_ENTITY} unless
+        stated otherwise.
+      </p>
+
+      <h2>Governing law</h2>
+      <p>
+        These terms are governed by the laws of the Commonwealth of Virginia.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions about these terms: <a href={`mailto:${CONTACT.email}`}
+          >{CONTACT.email}</a
+        >.
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

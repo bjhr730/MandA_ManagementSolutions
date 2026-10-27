@@ -1,0 +1,87 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Disclosure from '~/components/Disclosure.astro';
+import PageHeader from '~/components/PageHeader.astro';
+import Section from '~/components/Section.astro';
+
+import {
+  EQUAL_HOUSING,
+  REVIEW_MODE,
+  VA_PROTECTED_CLASSES,
+} from '~/config/compliance';
+import { LEGAL_ENTITY } from '~/config/site';
+---
+
+<BaseLayout
+  title="Fair Housing"
+  description="Our equal housing opportunity commitment and the protected classes under federal and Virginia fair housing law."
+>
+  <PageHeader
+    eyebrow="Fair housing"
+    title="Equal Housing Opportunity"
+    lead="We do business in accordance with federal and Virginia fair housing law."
+  />
+
+  <Section>
+    <div class="prose-site">
+      {
+        REVIEW_MODE && (
+          <Disclosure label="Pre-launch notice" pending>
+            <p>
+              This statement has not yet been reviewed by a Virginia attorney
+              or the supervising broker, and the list of protected classes
+              below has not been verified against the current statute. Confirm
+              both before launch.
+            </p>
+          </Disclosure>
+        )
+      }
+
+      <h2>Our commitment</h2>
+      <p>{EQUAL_HOUSING}</p>
+
+      <h2>Protected classes</h2>
+      <p>
+        {LEGAL_ENTITY} does not discriminate in the rental, leasing, management
+        or advertising of housing on the basis of:
+      </p>
+      <ul class="mt-4 grid gap-2 sm:grid-cols-2">
+        {
+          VA_PROTECTED_CLASSES.map((item) => (
+            <li class="flex gap-2.5">
+              <span aria-hidden="true" class="mt-2 size-1.5 shrink-0 rounded-full bg-accent"></span>
+              <span class="capitalize">{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-6">
+        Federal fair housing law protects race, color, religion, sex, handicap,
+        familial status and national origin. Virginia fair housing law protects
+        additional classes, and some localities protect more still.
+      </p>
+
+      <h2>How this shows up in practice</h2>
+      <p>
+        Applicant screening is run against consistent, written criteria applied
+        the same way to every applicant, and all decisions are made in
+        accordance with fair housing and other applicable requirements. We
+        accommodate reasonable requests relating to disability in line with
+        applicable law.
+      </p>
+
+      <h2>Reporting a concern</h2>
+      <p>
+        If you believe you have been treated unfairly, tell us and we will look
+        into it. You may also file a complaint with the
+        <a
+          href="https://www.dpor.virginia.gov/Boards/Fair-Housing"
+          rel="noopener">Virginia Fair Housing Office</a
+        > or the
+        <a href="https://www.hud.gov/fair_housing" rel="noopener"
+          >U.S. Department of Housing and Urban Development</a
+        >.
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

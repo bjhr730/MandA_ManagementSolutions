@@ -1,0 +1,46 @@
+---
+import { PRICING_DISCLOSURE } from '~/config/compliance';
+import { CONTACT } from '~/config/site';
+
+interface Props {
+  heading?: string;
+  body?: string;
+  /** Hide the pricing disclosure where the page already carries it. */
+  showDisclosure?: boolean;
+}
+
+const {
+  heading = 'Request an owner consultation',
+  body = 'Tell us about your property and what you want from management. We will come back to you with a written proposal, every applicable fee disclosed.',
+  showDisclosure = true,
+} = Astro.props;
+---
+
+<section class="bg-navy-800 py-16 md:py-20" aria-labelledby="cta-heading">
+  <div class="container-page">
+    <div class="max-w-2xl">
+      <h2 id="cta-heading" class="text-h2 text-white">{heading}</h2>
+      <p class="mt-4 text-lead text-silver-200">{body}</p>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <a href="/contact" class="btn btn-on-dark w-full sm:w-auto">
+          Start with a consultation
+        </a>
+        <a
+          href={CONTACT.phoneHref}
+          class="btn w-full border border-white/30 text-white hover:bg-white/10 sm:w-auto"
+        >
+          Call {CONTACT.phone}
+        </a>
+      </div>
+
+      {
+        showDisclosure && (
+          <p class="mt-7 max-w-xl text-xs leading-relaxed text-silver-400">
+            {PRICING_DISCLOSURE}
+          </p>
+        )
+      }
+    </div>
+  </div>
+</section>

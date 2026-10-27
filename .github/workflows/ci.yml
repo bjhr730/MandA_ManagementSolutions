@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Types and Astro template diagnostics.
+      - run: npm run check
+
+      # A build failure is the only other way this site can break at deploy
+      # time, so it is the whole test suite.
+      - run: npm run build
+        env:
+          SITE_URL: https://example.com

@@ -1,0 +1,27 @@
+---
+/**
+ * A compliance note. Rendered as an aside so screen-reader users can skip it,
+ * and visually quiet so it does not compete with the copy, but never hidden:
+ * these notes are the ones that have to be read.
+ */
+interface Props {
+  label?: string;
+  /** Marks text still awaiting legal review. */
+  pending?: boolean;
+}
+
+const { label = 'Disclosure', pending = false } = Astro.props;
+---
+
+<aside
+  class={`rounded-md border-l-4 px-4 py-3 text-sm leading-relaxed ${
+    pending
+      ? 'border-accent bg-surface-3 text-ink'
+      : 'border-line-strong bg-surface-2 text-ink-muted'
+  }`}
+>
+  <p class="font-sans text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+    {pending ? `${label} \u2014 pending review` : label}
+  </p>
+  <div class="mt-1.5"><slot /></div>
+</aside>

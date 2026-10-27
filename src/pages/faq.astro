@@ -1,0 +1,56 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Cta from '~/components/Cta.astro';
+import Disclosure from '~/components/Disclosure.astro';
+import FaqList from '~/components/FaqList.astro';
+import JsonLd from '~/components/JsonLd.astro';
+import PageHeader from '~/components/PageHeader.astro';
+import Section from '~/components/Section.astro';
+
+import { FAQ, FAQ_INTRO } from '~/content/faq';
+import { TAGLINE } from '~/config/site';
+import { PRICING_DISCLOSURE } from '~/config/compliance';
+import { breadcrumbs, faqPage } from '~/lib/schema';
+---
+
+<BaseLayout
+  title="Frequently Asked Questions"
+  description="Owner questions about involvement, fees, termination, maintenance, rental pricing, screening, statements, disbursements, HOA coordination and support for out-of-state and international owners."
+>
+  <JsonLd slot="head" schema={faqPage()} />
+  <JsonLd
+    slot="head"
+    schema={breadcrumbs([
+      { name: 'Frequently Asked Questions', path: '/faq' },
+    ])}
+  />
+
+  <PageHeader
+    eyebrow="Frequently asked questions"
+    title={TAGLINE}
+    lead={FAQ_INTRO}
+  />
+
+  <Section labelledby="faq-heading">
+    <div class="max-w-3xl">
+      <h2 id="faq-heading" class="sr-only">All questions</h2>
+      <FaqList entries={FAQ} />
+
+      <div class="mt-12">
+        <Disclosure label="Pricing">
+          <p>{PRICING_DISCLOSURE}</p>
+        </Disclosure>
+      </div>
+
+      <p class="mt-10 text-ink-muted">
+        Still have a question? <a
+          href="/contact"
+          class="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4"
+          >Ask us directly</a
+        > and we will answer it straight.
+      </p>
+    </div>
+  </Section>
+
+  <Cta />
+</BaseLayout>

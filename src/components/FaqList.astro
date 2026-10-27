@@ -1,0 +1,50 @@
+---
+import type { FaqEntry } from '~/content/faq';
+
+interface Props {
+  entries: readonly FaqEntry[];
+  /** Heading level for each question, so the page keeps a sane outline. */
+  level?: 'h2' | 'h3';
+}
+
+const { entries, level = 'h3' } = Astro.props;
+const Heading = level;
+---
+
+<!--
+  Native <details>/<summary>: keyboard operable, announced correctly, and
+  findable by in-page search once open. No JavaScript at all.
+-->
+<ul class="divide-y divide-line border-y border-line">
+  {
+    entries.map((entry) => (
+      <li>
+        <details class="group">
+          <summary
+            class="flex min-h-14 items-center justify-between gap-4 py-4 text-left hover:text-accent"
+          >
+            <Heading class="text-h3 font-serif font-semibold">
+              {entry.q}
+            </Heading>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              class="size-5 shrink-0 transition-transform group-open:rotate-45"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </summary>
+          <div class="prose-site pb-6 text-ink-muted">
+            {entry.a.map((paragraph) => (
+              <p>{paragraph}</p>
+            ))}
+          </div>
+        </details>
+      </li>
+    ))
+  }
+</ul>

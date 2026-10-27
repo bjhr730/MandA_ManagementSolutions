@@ -1,0 +1,102 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Cta from '~/components/Cta.astro';
+import JsonLd from '~/components/JsonLd.astro';
+import Section from '~/components/Section.astro';
+
+import {
+  FOUNDER_NAME,
+  FOUNDER_ROLE,
+  FOUNDER_SECTIONS,
+  FOUNDER_STATS,
+} from '~/content/founder';
+import { LEGAL_ENTITY } from '~/config/site';
+import { breadcrumbs, founderPerson } from '~/lib/schema';
+---
+
+<BaseLayout
+  title="Meet the Founder"
+  description="Antonio Melendez is a Northern Virginia real estate broker, property manager and investor, a multi-year NVAR Top Producer with more than 215 transactions and experience leading a 200-property portfolio."
+>
+  <JsonLd slot="head" schema={founderPerson()} />
+  <JsonLd
+    slot="head"
+    schema={breadcrumbs([{ name: 'Meet the Founder', path: '/founder' }])}
+  />
+
+  <div class="border-b border-line bg-surface-2">
+    <div class="container-page py-12 md:py-16">
+      <div class="grid gap-10 lg:grid-cols-[22rem_1fr] lg:gap-16">
+        {/*
+          Headshot slot, 4:5. The real portrait drops straight in here with no
+          layout change, which is why the aspect ratio is fixed now.
+        */}
+        <div
+          class="flex aspect-4/5 w-full max-w-sm items-center justify-center rounded-lg border border-dashed border-line-strong bg-surface-3"
+        >
+          <p class="px-6 text-center text-sm text-ink-muted">
+            Professional headshot
+            <span class="mt-1 block text-xs">
+              Replace with a 4:5 portrait at 1000&times;1250 or larger
+            </span>
+          </p>
+        </div>
+
+        <div class="lg:self-center">
+          <p class="eyebrow">Meet the founder</p>
+          <h1 class="mt-3 text-display">{FOUNDER_NAME}</h1>
+          <p class="mt-3 text-lead text-ink-muted">{FOUNDER_ROLE}</p>
+
+          <dl class="mt-10 grid grid-cols-2 gap-x-6 gap-y-6 border-t border-line pt-7 sm:grid-cols-3">
+            {
+              FOUNDER_STATS.map((stat) => (
+                <div class="flex flex-col-reverse">
+                  <dt class="mt-1 text-sm leading-snug text-ink-muted">
+                    {stat.label}
+                  </dt>
+                  <dd class="font-serif text-2xl font-semibold text-ink">
+                    {stat.value}
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Section>
+    <div class="prose-site">
+      {
+        FOUNDER_SECTIONS.map((section) => (
+          <div class="mt-12 first:mt-0">
+            {section.heading && <h2 class="text-h2">{section.heading}</h2>}
+            {section.paragraphs.map((paragraph) => (
+              <p class="text-lead text-ink-muted">{paragraph}</p>
+            ))}
+            {section.quote && (
+              <blockquote class="mt-8 border-l-4 border-accent pl-6">
+                <p class="font-serif text-h3 text-ink italic">
+                  &ldquo;{section.quote}&rdquo;
+                </p>
+                <footer class="mt-3 text-sm font-medium text-ink-muted">
+                  {FOUNDER_NAME}
+                </footer>
+              </blockquote>
+            )}
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="mt-14 max-w-2xl text-sm text-ink-muted">
+      {FOUNDER_NAME} is the founder of {LEGAL_ENTITY}.
+    </p>
+  </Section>
+
+  <Cta
+    heading="Talk to Antonio directly"
+    body="A consultation is a conversation about your property with the person who will be responsible for it."
+  />
+</BaseLayout>

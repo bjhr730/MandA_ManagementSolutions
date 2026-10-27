@@ -1,0 +1,51 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Section from '~/components/Section.astro';
+import { CONTACT } from '~/config/site';
+---
+
+<BaseLayout
+  title="Thank You"
+  description="We have received your inquiry and will be in touch shortly."
+  noindex
+>
+  <Section>
+    <div class="max-w-2xl">
+      <span
+        aria-hidden="true"
+        class="inline-flex size-12 items-center justify-center rounded-full bg-surface-3 text-accent"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="size-6"
+        >
+          <path d="m5 13 4 4 10-11" />
+        </svg>
+      </span>
+
+      <h1 class="mt-6 text-display">Thank you &mdash; we have it</h1>
+      <p class="mt-5 text-lead text-ink-muted">
+        Your inquiry is with us and a confirmation is on its way to your inbox.
+        We will be in touch shortly to arrange your consultation.
+      </p>
+
+      <p class="mt-6 text-ink-muted">
+        If it is urgent, call <a
+          href={CONTACT.phoneHref}
+          class="font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4"
+          >{CONTACT.phone}</a
+        >.
+      </p>
+
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a href="/" class="btn btn-primary">Back to home</a>
+        <a href="/faq" class="btn btn-secondary">Read owner FAQ</a>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

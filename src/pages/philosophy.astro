@@ -1,0 +1,56 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Cta from '~/components/Cta.astro';
+import JsonLd from '~/components/JsonLd.astro';
+import PageHeader from '~/components/PageHeader.astro';
+import Section from '~/components/Section.astro';
+
+import { PHILOSOPHY_HEADING, PRINCIPLES } from '~/content/philosophy';
+import { TAGLINE } from '~/config/site';
+import { breadcrumbs } from '~/lib/schema';
+---
+
+<BaseLayout
+  title="Our Philosophy"
+  description="Integrity over profit. Honesty, communication and transparency. Your property, our responsibility. The three principles behind M&A Management Solutions."
+>
+  <JsonLd
+    slot="head"
+    schema={breadcrumbs([{ name: 'Our Philosophy', path: '/philosophy' }])}
+  />
+
+  <PageHeader
+    eyebrow="Our philosophy"
+    title={PHILOSOPHY_HEADING}
+    lead={TAGLINE}
+  />
+
+  <Section>
+    <ol class="space-y-16 md:space-y-20">
+      {
+        PRINCIPLES.map((principle) => (
+          <li class="grid gap-6 md:grid-cols-[6rem_1fr] md:gap-10">
+            <p
+              aria-hidden="true"
+              class="font-serif text-4xl font-semibold text-ornament md:text-5xl"
+            >
+              {principle.number}
+            </p>
+            <div class="max-w-2xl">
+              <h2 class="text-h2">{principle.title}</h2>
+              <p class="mt-5 font-serif text-lead text-accent italic">
+                {principle.statement}
+              </p>
+              <p class="mt-5 text-lead text-ink-muted">{principle.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <Cta
+    heading="Hold us to it"
+    body="If transparency and accountability are what you want from a manager, start with a consultation and judge for yourself."
+  />
+</BaseLayout>

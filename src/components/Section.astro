@@ -1,0 +1,31 @@
+---
+/** Vertical rhythm wrapper. `tone` paints the band behind the content. */
+interface Props {
+  tone?: 'default' | 'muted' | 'inverse';
+  /** Tightens the vertical padding for dense bands. */
+  compact?: boolean;
+  labelledby?: string;
+  class?: string;
+}
+
+const {
+  tone = 'default',
+  compact = false,
+  labelledby,
+  class: className = '',
+} = Astro.props;
+
+const tones = {
+  default: 'bg-surface',
+  muted: 'bg-surface-2',
+  inverse: 'bg-navy-800 text-silver-200',
+};
+
+const pad = compact ? 'py-12 md:py-14' : 'py-16 md:py-24';
+---
+
+<section class={`${tones[tone]} ${pad}`} aria-labelledby={labelledby}>
+  <div class={`container-page ${className}`}>
+    <slot />
+  </div>
+</section>

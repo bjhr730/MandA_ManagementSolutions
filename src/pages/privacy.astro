@@ -1,0 +1,124 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Disclosure from '~/components/Disclosure.astro';
+import PageHeader from '~/components/PageHeader.astro';
+import Section from '~/components/Section.astro';
+
+import {
+  LEGAL_LAST_UPDATED,
+  LEGAL_REVIEW_DATE,
+  REVIEW_MODE,
+} from '~/config/compliance';
+import { CONTACT, LEGAL_ENTITY } from '~/config/site';
+---
+
+<BaseLayout
+  title="Privacy Policy"
+  description="What information this website collects, how it is used, and how to ask us to delete it."
+>
+  <PageHeader
+    eyebrow="Legal"
+    title="Privacy Policy"
+    lead={LEGAL_REVIEW_DATE ? `Last reviewed: ${LEGAL_REVIEW_DATE}` : LEGAL_LAST_UPDATED}
+  />
+
+  <Section>
+    <div class="prose-site">
+      {
+        REVIEW_MODE && (
+          <Disclosure label="Draft" pending>
+            <p>
+              This is a working draft describing what the website actually
+              does. It is not legal advice and has not been reviewed by an
+              attorney. Have a qualified Virginia professional review it, and
+              confirm whether any state privacy obligations apply, before
+              launch.
+            </p>
+          </Disclosure>
+        )
+      }
+
+      <h2>What we collect</h2>
+      <p>
+        This website collects personal information in exactly one place: the
+        owner inquiry form. When you submit it, we receive your name, email
+        address, phone number if you give one, the property address, your
+        answers to the optional questions about the property, and anything you
+        type in the message field.
+      </p>
+      <p>
+        We also record the IP address the submission came from, which is used
+        to limit spam and abuse.
+      </p>
+
+      <h2>What we do not do</h2>
+      <ul>
+        <li>We do not run advertising or tracking cookies on this site.</li>
+        <li>We do not use analytics that profile you across websites.</li>
+        <li>We do not sell, rent or trade your information.</li>
+        <li>
+          We do not send marketing email to people who only submitted an
+          inquiry.
+        </li>
+      </ul>
+
+      <h2>Why we hold it</h2>
+      <p>
+        To reply to your inquiry, to prepare a management proposal, and to keep
+        a record of the conversation if you become a client. That is all.
+      </p>
+
+      <h2>Who else sees it</h2>
+      <p>
+        Inquiry data is stored in our hosting provider&rsquo;s database and
+        delivered to us by an email delivery provider. Those providers process
+        the data on our behalf and are not permitted to use it for their own
+        purposes. We may share information where we are required to by law.
+      </p>
+
+      <h2>How long we keep it</h2>
+      <p>
+        Inquiries that do not lead to an engagement are kept while they may
+        still be relevant to a prospective client relationship, then deleted.
+        Records relating to an actual management engagement are kept for as
+        long as required by the management agreement and applicable
+        record-keeping rules.
+      </p>
+
+      <h2>Your choices</h2>
+      <p>
+        Ask us for a copy of what we hold about you, ask us to correct it, or
+        ask us to delete it. Email <a href={`mailto:${CONTACT.email}`}
+          >{CONTACT.email}</a
+        > or call <a href={CONTACT.phoneHref}>{CONTACT.phone}</a> and we will
+        action it.
+      </p>
+
+      <h2>Security</h2>
+      <p>
+        The site is served over HTTPS and inquiry data is transmitted
+        encrypted. No system is perfectly secure, so please do not send bank
+        details, government identification numbers or other sensitive
+        information through the website form.
+      </p>
+
+      <h2>Children</h2>
+      <p>
+        This site is intended for property owners and is not directed at
+        children.
+      </p>
+
+      <h2>Changes</h2>
+      <p>
+        If this policy changes we will update the date at the top of this page.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        {LEGAL_ENTITY}<br />
+        <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a><br />
+        <a href={CONTACT.phoneHref}>{CONTACT.phone}</a>
+      </p>
+    </div>
+  </Section>
+</BaseLayout>

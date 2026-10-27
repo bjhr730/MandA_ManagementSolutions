@@ -1,0 +1,183 @@
+---
+import Logo from './Logo.astro';
+import { CONTACT, NAV } from '~/config/site';
+
+const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (href: string) => path === href;
+---
+
+<header class="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur-sm">
+  <div class="container-page flex h-16 items-center justify-between gap-4 md:h-20">
+    <a href="/" class="flex items-center" aria-label="M&A Management Solutions, home">
+      <Logo />
+    </a>
+
+    <!-- Desktop navigation -->
+    <nav aria-label="Primary" class="hidden lg:block">
+      <ul class="flex items-center gap-1 whitespace-nowrap">
+        {
+          NAV.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                class="inline-flex min-h-11 items-center rounded px-3 text-sm font-medium text-ink-muted hover:bg-surface-3 hover:text-ink aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:decoration-accent aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-8"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a
+        href={CONTACT.phoneHref}
+        class="hidden min-h-11 items-center rounded px-3 text-sm font-medium text-ink-muted hover:text-ink xl:inline-flex"
+      >
+        {CONTACT.phone}
+      </a>
+      <a href="/contact" class="btn btn-primary hidden sm:inline-flex">
+        Owner consultation
+      </a>
+
+      <!-- Mobile menu trigger -->
+      <button
+        type="button"
+        id="nav-open"
+        aria-expanded="false"
+        aria-controls="nav-dialog"
+        class="inline-flex size-11 items-center justify-center rounded border border-line-strong text-ink lg:hidden"
+      >
+        <span class="sr-only">Open menu</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          class="size-5"
+        >
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!--
+    Native <dialog> gives us the focus trap, Escape-to-close and background
+    inerting for free, which is most of what a hand-rolled menu gets wrong.
+  -->
+  <dialog
+    id="nav-dialog"
+    aria-label="Site menu"
+    class="m-0 max-h-none min-h-dvh w-full max-w-none bg-surface p-0 text-ink backdrop:bg-navy-950/60"
+  >
+    <div class="container-page flex h-16 items-center justify-between">
+      <Logo />
+      <button
+        type="button"
+        id="nav-close"
+        class="inline-flex size-11 items-center justify-center rounded border border-line-strong text-ink"
+      >
+        <span class="sr-only">Close menu</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.75"
+          stroke-linecap="round"
+          class="size-5"
+        >
+          <path d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
+      </button>
+    </div>
+
+    <nav aria-label="Site" class="container-page pb-10">
+      <ul class="divide-y divide-line border-t border-line">
+        {
+          NAV.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                class="flex min-h-14 items-center text-lg font-medium text-ink aria-[current=page]:text-accent"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <a href="/contact" class="btn btn-primary mt-6 w-full">
+        Request an owner consultation
+      </a>
+
+      <a
+        href={CONTACT.phoneHref}
+        class="mt-3 flex min-h-11 items-center justify-center text-base font-medium text-ink-muted"
+      >
+        Call {CONTACT.phone}
+      </a>
+    </nav>
+  </dialog>
+
+  <noscript>
+    <nav aria-label="Primary" class="border-t border-line bg-surface-2 lg:hidden">
+      <ul class="container-page flex flex-wrap gap-x-4 gap-y-1 py-3">
+        {
+          NAV.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="inline-flex min-h-11 items-center text-sm font-medium text-ink underline"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </noscript>
+</header>
+
+<script>
+  const dialog = document.getElementById('nav-dialog') as HTMLDialogElement | null;
+  const openBtn = document.getElementById('nav-open');
+  const closeBtn = document.getElementById('nav-close');
+
+  if (dialog && openBtn && closeBtn) {
+    const setExpanded = (value: boolean) =>
+      openBtn.setAttribute('aria-expanded', String(value));
+
+    openBtn.addEventListener('click', () => {
+      dialog.showModal();
+      setExpanded(true);
+    });
+
+    closeBtn.addEventListener('click', () => dialog.close());
+
+    // Fires for Escape as well as close(), so focus always returns correctly.
+    dialog.addEventListener('close', () => {
+      setExpanded(false);
+      openBtn.focus();
+    });
+
+    // Tapping the backdrop closes the menu.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // A same-page link leaves the dialog open over the new scroll position.
+    dialog.addEventListener('click', (event) => {
+      const link = (event.target as HTMLElement).closest('a');
+      if (link) dialog.close();
+    });
+  }
+</script>

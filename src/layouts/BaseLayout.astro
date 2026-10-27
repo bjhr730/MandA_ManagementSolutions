@@ -1,0 +1,59 @@
+---
+import '~/styles/fonts.css';
+import '~/styles/global.css';
+
+import Footer from '~/components/Footer.astro';
+import Header from '~/components/Header.astro';
+import Seo from '~/components/Seo.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  noindex?: boolean;
+}
+
+const { title, description, noindex } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#303a46" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!--
+      The two latin variable fonts are the only blocking subresources on the
+      site. Preloading them removes the second round trip that would otherwise
+      delay the largest text block.
+    -->
+    <link
+      rel="preload"
+      href="/fonts/source-serif-4-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/inter-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <Seo title={title} description={description} noindex={noindex} />
+    <slot name="head" />
+  </head>
+
+  <body class="min-h-dvh bg-surface text-ink antialiased">
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,243 @@
+# M&A Management Solutions
+
+Marketing website for **M&A Management Solutions of Virginia, LLC**, a
+residential property management company serving Northern Virginia.
+
+The site has one job: turn a property owner into a consultation request.
+Everything else serves that.
+
+- **Framework:** [Astro 5](https://astro.build) — static HTML, no client framework
+- **Styling:** Tailwind CSS v4 (CSS-first config, no `tailwind.config.js`)
+- **Forms:** Astro server route → Neon Postgres → Resend
+- **Hosting:** Vercel
+
+**Shipped to the browser: ~2.2 KB of JavaScript**, for the mobile menu. That is
+the whole budget. Please keep it that way.
+
+---
+
+## Quick start
+
+```bash
+npm install
+cp .env.example .env    # then fill it in
+npm run dev             # http://localhost:4321
+```
+
+| Script | Does |
+| --- | --- |
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Production build into `dist/` and `.vercel/output/` |
+| `npm run preview` | Serve the production build locally |
+| `npm run check` | `astro check` — TypeScript and template diagnostics |
+
+Node 20.3+ is required. Vercel runs the deployed functions on Node 22; if you
+develop on Node 24 you will see a harmless warning at build time.
+
+### A note on the `rollup` override
+
+`package.json` pins `rollup` to `@rollup/wasm-node`. This is a workaround for a
+development machine where Windows Application Control blocks rollup's native
+`.node` binary, which otherwise fails the build with `ERR_DLOPEN_FAILED`. The
+WASM build is a drop-in replacement and is slightly slower. If nobody is
+building on a machine with that policy, delete the `overrides` block and run
+`npm install` to go back to native rollup.
+
+---
+
+## Editing the content
+
+All copy lives in `src/content/` as typed data. No CMS, no database, no admin
+login — change the file, commit, and the site rebuilds.
+
+| File | Holds |
+| --- | --- |
+| `src/content/home.ts` | Home page hero, benefits, founder teaser |
+| `src/content/about.ts` | About Us copy and the mission statement |
+| `src/content/founder.ts` | Antonio's bio, pull-quotes and credential stats |
+| `src/content/philosophy.ts` | The three guiding principles |
+| `src/content/services.ts` | The seven services |
+| `src/content/why-us.ts` | Why Choose Us reasons |
+| `src/content/management-plans.ts` | Plans page, fee categories, what's included |
+| `src/content/faq.ts` | The 13 FAQ entries, in the approved order |
+
+Two config files hold everything else:
+
+- **`src/config/site.ts`** — phone, email, address, hours, service areas,
+  navigation, and the portal feature flag. Every unknown real-world fact is in
+  here and marked `REPLACE`.
+- **`src/config/compliance.ts`** — fair housing statement, brokerage
+  disclosure, pricing disclosure, licence numbers.
+
+### Turning the portals on
+
+Buildium is not live yet. When it is, open `src/config/site.ts`, set
+`PORTALS_LIVE = true` and fill in the two URLs. That one change reveals the
+portal links in the footer and turns `/portals` from a "coming soon" page into
+a real one. Until then, nothing on the site mentions a portal — which is what
+the launch checklist requires.
+
+### Turning off the pre-launch banners
+
+`src/config/compliance.ts` exports `REVIEW_MODE = true`. While it is true, the
+footer and the legal pages carry a visible notice that the disclosures have
+not been reviewed. Set it to `false` only after a qualified Virginia
+professional has signed off on that file.
+
+---
+
+## Environment variables
+
+Copy `.env.example` to `.env` locally; set the same keys as Vercel project
+environment variables in production.
+
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `SITE_URL` | yes | Canonical origin, no trailing slash. Drives canonical tags, sitemap, robots.txt, Open Graph. |
+| `RESEND_API_KEY` | prod | Without it, inquiries are still stored but no email is sent. |
+| `INQUIRY_FROM_EMAIL` | prod | Must be on a domain verified in Resend. |
+| `INQUIRY_TO_EMAIL` | prod | Where owner inquiries land. |
+| `DATABASE_URL` | prod | Neon pooled connection string. |
+| `PUBLIC_TURNSTILE_SITE_KEY` | prod | Public; rendered into the page. |
+| `TURNSTILE_SECRET_KEY` | prod | **Secret.** If unset in production, every submission is rejected rather than left unprotected. Leave both blank locally to skip the check. |
+
+---
+
+## How the inquiry form works
+
+`/contact` is the only route that is not static (`export const prerender =
+false`). It handles its own `POST` so that a failed submission can re-render
+with the values intact and each error attached to its field — no JavaScript
+required. On success it redirects to `/thank-you` (303), so a refresh resends
+nothing.
+
+```
+POST /contact
+  ├─ honeypot check      → silently accepted, nothing stored
+  ├─ zod validation      → re-render with errors + submitted values
+  ├─ Turnstile verify    → skipped locally, enforced in production
+  ├─ INSERT into Neon    ← stored FIRST, so an email outage cannot lose a lead
+  ├─ Resend → Antonio    (reply-to is the inquirer)
+  ├─ Resend → inquirer   (acknowledgement)
+  └─ 303 → /thank-you
+```
+
+Storage and email failures are logged, not surfaced: once the row is in, the
+person gets their confirmation either way.
+
+### The database
+
+One table. Create it with:
+
+```sql
+CREATE TABLE IF NOT EXISTS inquiries (
+  id               bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  created_at       timestamptz NOT NULL DEFAULT now(),
+  name             text        NOT NULL,
+  email            text        NOT NULL,
+  phone            text,
+  property_address text        NOT NULL,
+  property_type    text,
+  occupancy        text,
+  involvement      text,
+  timeline         text,
+  message          text,
+  source_ip        text,
+  handled_at       timestamptz,
+  notes            text
+);
+CREATE INDEX IF NOT EXISTS inquiries_created_at_idx ON inquiries (created_at DESC);
+```
+
+`handled_at` and `notes` are there so inquiries can be worked through without
+needing a second system.
+
+---
+
+## Accessibility
+
+Target is **WCAG 2.2 Level AA**, and it is verified rather than assumed: every
+page audits clean under axe-core (`wcag2a`, `wcag2aa`, `wcag21aa`, `wcag22aa`
+and best-practice rules).
+
+What that means in practice:
+
+- Semantic landmarks, one `<h1>` per page, no skipped heading levels.
+- A skip link, and a focus ring that is never removed.
+- The mobile menu is a native `<dialog>`, so the focus trap, Escape handling
+  and background inerting are the browser's job, not ours.
+- The FAQ is `<details>`/`<summary>` — zero JavaScript, correct semantics.
+- The form has permanent visible labels, `autocomplete` attributes, inline
+  errors tied by `aria-describedby`, and an error summary that the browser
+  focuses natively because it is the form's fragment target.
+- Spam protection is Turnstile, not a visual puzzle.
+- Every text colour is contrast-checked against its surface; ratios are noted
+  inline in `src/styles/global.css`.
+- Dark mode follows the OS preference, with no toggle and no flash.
+
+Re-run the audit by serving `axe.min.js` from `public/` and calling `axe.run()`
+against each route, or point any axe-based tool at the dev server.
+
+## Performance
+
+| | |
+| --- | --- |
+| JavaScript shipped | ~2.2 KB (mobile menu only) |
+| CSS | ~30 KB uncompressed, one file |
+| Fonts | 2 × latin-only variable woff2, ~99 KB total, preloaded |
+| Third-party requests | none, except Turnstile when configured |
+
+No analytics, no tag manager, no web font CDN. If you add any of those, measure
+first.
+
+---
+
+## Before launch
+
+Owned by the business, not the code:
+
+- [ ] Fill in every `REPLACE` in `src/config/site.ts` (phone, email, address, hours)
+- [ ] Fill in `src/config/compliance.ts` (brokerage name, DPOR licence numbers)
+- [ ] Have a qualified Virginia professional review `/privacy`, `/terms` and
+      `/fair-housing`, then set `LEGAL_REVIEW_DATE` and `REVIEW_MODE = false`
+- [ ] Verify the Virginia Fair Housing protected-class list is current
+- [ ] Confirm the founder bio's property count (the two source drafts disagree:
+      "approximately 60" vs "60–85")
+- [ ] Add the real logo (replace `src/components/Logo.astro` and `public/favicon.svg`)
+- [ ] Add Antonio's headshot — a 4:5 portrait, 1000×1250 or larger. Slots are
+      already sized on `/` and `/founder`, so it drops in with no layout change.
+- [ ] Re-run `node scripts/generate-images.mjs` after the logo lands
+- [ ] Register the domain, set `SITE_URL`, verify the sending domain in Resend
+- [ ] Set up Cloudflare Turnstile and add both keys in Vercel
+- [ ] Delete the test row from `inquiries` (`DELETE FROM inquiries WHERE email = 'test.owner@example.com'`)
+- [ ] Submit the live form end to end and confirm both emails arrive
+- [ ] Set up the Google Business Profile once eligible
+
+---
+
+## Deploying
+
+Connect the repository to Vercel. The `@astrojs/vercel` adapter is already
+configured; no build settings need changing. Add the environment variables
+above in the Vercel project, including `SITE_URL` with the production domain.
+
+Static pages are served from the CDN. `/contact` runs as a serverless function
+because it accepts `POST`.
+
+## Project layout
+
+```
+src/
+├─ components/   Header, Footer, Seo, JsonLd, Cta, FaqList, InquiryForm, ...
+├─ config/       site.ts (facts), compliance.ts (disclosures)
+├─ content/      all page copy, as typed data
+├─ layouts/      BaseLayout.astro
+├─ lib/          inquiry.ts (validate/store/notify), schema.ts (JSON-LD)
+├─ pages/        one file per route; robots.txt.ts is generated
+└─ styles/       global.css (tokens), fonts.css (@font-face)
+```
+
+Structured data is built in `src/lib/schema.ts`: `RealEstateAgent` with the
+Northern Virginia service area, `Person` for Antonio, `FAQPage` on `/faq`, and
+breadcrumbs on inner pages. It deliberately omits any field that is still a
+placeholder — wrong structured data hurts local search more than none.

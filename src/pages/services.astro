@@ -1,0 +1,122 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Cta from '~/components/Cta.astro';
+import Disclosure from '~/components/Disclosure.astro';
+import Icon from '~/components/Icon.astro';
+import JsonLd from '~/components/JsonLd.astro';
+import PageHeader from '~/components/PageHeader.astro';
+import Section from '~/components/Section.astro';
+
+import { SERVICES } from '~/content/services';
+import { BROKERAGE_DISCLOSURE } from '~/config/compliance';
+import { breadcrumbs } from '~/lib/schema';
+---
+
+<BaseLayout
+  title="Our Services"
+  description="Property oversight, rent collection and owner disbursements, maintenance and emergency coordination, tenant relations, inspections, lease renewals and leasing through our affiliated licensed brokerage."
+>
+  <JsonLd
+    slot="head"
+    schema={breadcrumbs([{ name: 'Our Services', path: '/services' }])}
+  />
+
+  <PageHeader
+    eyebrow="Our services"
+    title="What we handle for you"
+    lead="The day-to-day work of keeping a rental property occupied, maintained and profitable, with you as involved as you want to be."
+  />
+
+  <Section>
+    {/* Jump list: 7 sections is enough to be worth skipping around. */}
+    <nav aria-label="Services on this page" class="mb-14">
+      <ul class="flex flex-wrap gap-2">
+        {
+          SERVICES.map((service) => (
+            <li>
+              <a
+                href={`#${service.slug}`}
+                class="inline-flex min-h-11 items-center rounded-full border border-line-strong px-4 text-sm font-medium text-ink hover:bg-surface-3"
+              >
+                {service.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="space-y-14">
+      {
+        SERVICES.map((service) => (
+          <article
+            id={service.slug}
+            class="scroll-mt-24 border-t border-line pt-8"
+            aria-labelledby={`${service.slug}-heading`}
+          >
+            <div class="grid gap-6 md:grid-cols-[1fr_1.2fr] md:gap-12">
+              <div>
+                <span class="inline-flex size-11 items-center justify-center rounded-lg bg-surface-3 text-accent">
+                  <Icon name={service.icon} />
+                </span>
+                <h2 id={`${service.slug}-heading`} class="mt-4 text-h2">
+                  {service.title}
+                </h2>
+                <p class="mt-4 text-ink-muted">{service.summary}</p>
+              </div>
+
+              <div>
+                <h3 class="sr-only">What this includes</h3>
+                <ul class="space-y-3">
+                  {service.points.map((point) => (
+                    <li class="flex gap-3 text-ink">
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="mt-1 size-4 shrink-0 text-accent"
+                      >
+                        <path d="m4 10.5 4 4 8-9" />
+                      </svg>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {service.brokerage && (
+                  <div class="mt-6">
+                    <Disclosure label="Brokerage" pending>
+                      <p>{BROKERAGE_DISCLOSURE}</p>
+                    </Disclosure>
+                  </div>
+                )}
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section tone="muted" compact labelledby="scope-heading">
+    <div class="max-w-3xl">
+      <h2 id="scope-heading" class="text-h3">
+        Not every property needs every service
+      </h2>
+      <p class="mt-4 text-ink-muted">
+        What we take on is set out in your management agreement, including the
+        authorization limits for repairs and the services you want us to
+        coordinate. We will walk you through all of it before you sign.
+      </p>
+      <a href="/management-plans" class="btn btn-secondary mt-7">
+        How management plans work
+      </a>
+    </div>
+  </Section>
+
+  <Cta />
+</BaseLayout>
