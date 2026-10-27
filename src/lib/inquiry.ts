@@ -243,7 +243,42 @@ async function notify(data: InquiryInput) {
   });
 }
 
+/**
+ * Same-origin check, replacing Astro's built-in one (see astro.config.mjs).
+ *
+ * Compares the Origin header against the host the browser actually addressed,
+ * taking x-forwarded-host first so it is correct behind Vercel's proxy. A
+ * request with no Origin header is allowed through: browsers send one on every
+ * cross-site form POST, so its absence is not evidence of an attack, and
+ * Turnstile plus the honeypot are the real defence here. There is no session
+ * or cookie state on this site for a forged POST to act on.
+ */
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  if (!origin) return true;
+
+  const host =
+    request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  if (!host) return true;
+
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
+
 export async function handleInquiry(request: Request): Promise<InquiryResult> {
+  if (!sameOrigin(request)) {
+    console.warn('[inquiry] Rejected a cross-origin submission.');
+    return {
+      status: 'error',
+      message:
+        'That submission did not come from this site. Please reload the page and try again.',
+      values: {},
+    };
+  }
+
   const form = await request.formData();
   const values = readValues(form);
 

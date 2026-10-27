@@ -24,6 +24,14 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  security: {
+    // Astro's built-in cross-origin POST check compares the Origin header
+    // against the host it sees, which behind Vercel's proxy is not the host
+    // the browser addressed. The result is a 403 on every form submission,
+    // including same-origin ones. We do the equivalent check ourselves in
+    // src/lib/inquiry.ts, against the forwarded host, so it survives the proxy.
+    checkOrigin: false,
+  },
   build: {
     inlineStylesheets: 'auto',
   },
