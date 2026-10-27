@@ -10,6 +10,18 @@ export const SITE_URL: string = (
   import.meta.env.SITE_URL ?? 'https://replace-me.example.com'
 ).replace(/\/$/, '');
 
+/**
+ * Search engines are kept out until this is explicitly turned on.
+ *
+ * The site carries placeholder contact details and unreviewed legal text
+ * before launch, and a staging deployment is a real, crawlable origin. An
+ * indexed pre-launch copy competes with the real site and puts draft
+ * disclosures in front of the public, so the safe default is "no".
+ *
+ * Set SITE_INDEXABLE="true" in the production environment at launch.
+ */
+export const INDEXABLE: boolean = import.meta.env.SITE_INDEXABLE === 'true';
+
 /** Public-facing brand name, used in headings and nav. */
 export const BRAND = 'M&A Management Solutions';
 

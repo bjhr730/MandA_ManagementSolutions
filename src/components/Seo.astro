@@ -1,5 +1,5 @@
 ---
-import { BRAND, LEGAL_ENTITY, SITE_URL } from '~/config/site';
+import { BRAND, INDEXABLE, LEGAL_ENTITY, SITE_URL } from '~/config/site';
 
 interface Props {
   title: string;
@@ -25,7 +25,14 @@ const fullTitle =
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical.href} />
 
-{noindex && <meta name="robots" content="noindex, follow" />}
+{
+  /* Page-level opt-out, or the site-wide pre-launch block. */
+  !INDEXABLE ? (
+    <meta name="robots" content="noindex, nofollow" />
+  ) : noindex ? (
+    <meta name="robots" content="noindex, follow" />
+  ) : null
+}
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={LEGAL_ENTITY} />

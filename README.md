@@ -94,6 +94,7 @@ environment variables in production.
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `SITE_URL` | yes | Canonical origin, no trailing slash. Drives canonical tags, sitemap, robots.txt, Open Graph. |
+| `SITE_INDEXABLE` | launch | Anything but `"true"` serves `Disallow: /` and a `noindex` meta on every page. Leave unset on staging; set to `"true"` in production at launch. |
 | `RESEND_API_KEY` | prod | Without it, inquiries are still stored but no email is sent. |
 | `INQUIRY_FROM_EMAIL` | prod | Must be on a domain verified in Resend. |
 | `INQUIRY_TO_EMAIL` | prod | Where owner inquiries land. |
@@ -208,6 +209,8 @@ Owned by the business, not the code:
       already sized on `/` and `/founder`, so it drops in with no layout change.
 - [ ] Re-run `node scripts/generate-images.mjs` after the logo lands
 - [ ] Register the domain, set `SITE_URL`, verify the sending domain in Resend
+- [ ] Set `SITE_INDEXABLE="true"` in production (and only production) so the
+      site can be indexed
 - [ ] Set up Cloudflare Turnstile and add both keys in Vercel
 - [ ] Delete the test row from `inquiries` (`DELETE FROM inquiries WHERE email = 'test.owner@example.com'`)
 - [ ] Submit the live form end to end and confirm both emails arrive
